@@ -25,7 +25,6 @@ li {
 }
 
 .tier {
-
     display:flex;
     min-height: 110px;
     padding:3px;
@@ -118,14 +117,15 @@ li {
     font-weight: bold;
 }
 
+
 .item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2px;
+    padding: 0px;
     background: #2e2e2e;
     color: white;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: grab;
     max-width: 100px;
     min-width: 100px;
@@ -134,15 +134,31 @@ li {
     margin:1px;
 }
 .item img {
-    max-width: 100px;
-    max-height: 100px;
+    width: 100px;
+    height: 75px;
+    border: 0px;
     border-radius: 4px;
 }
 .item span {
     font-size: 12px;
+    height: 25px;
     word-wrap: break-word;
     text-align: center;
 }
+
+
+#item-preview-container {
+    display: flex;
+}
+
+
+#item-preview-container {
+  width: 100%;
+  height: 700px;
+  border: 1px solid #555;
+
+}
+
 
 .sortable-chosen {
   opacity: 1 !important;

@@ -1,44 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Simple Drag and Drop Local</title>
     <link rel="stylesheet" href="mainStyle.css">
     <script src="js/Sortable.min.js"></script>
-    <script src="js/mainScript.js"defer></script>
+    <script src="js/mainScript.js" defer></script>
 </head>
 <h1>Tier List Maker</h1>
-<div id="expanding-zones-container">
-    <div id="all-item-holders-container">
-        <ul id="tiers-container">
-        </ul>
-        <ul id="queue">
-            <!-- Items created are placed here-->
-        </ul>
+    <div id="expanding-zones-container">
+        <div id="all-item-holders-container">
+            <ul id="tiers-container">
+            </ul>
+            <ul id="queue">
+                <!-- Items created are placed here-->
+            </ul>
+        </div>
+        <!-- Shrink deletion zone to match height of only tiers. -->
+        <div id="deletion-zone">
+            🗑️ Drag here to delete items
+        </div>
     </div>
-    <!-- Shrink deletion zone to match height of only tiers. -->
-    <div id="deletion-zone">
-        🗑️ Drag here to delete items
+    <div class="entire-collection">
+
+        <div id="item-preview-container">
+            <!-- Need to add the resizeable item preview area here-->
+
+            <div class="button-container">
+                <button onclick="createNewTier()">Create A Tier!</button>
+                <button onclick="removeLastTier()">Remove A Tier!</button>
+            </div>
+
+            <div id="item-adder">
+                <input type="file" id="imageUpload" accept="image/*">
+                <input type="text" id="imageLabel" placeholder="Item Name...">
+                <button onclick="addImageItemToQueue()">Add Item!</button>
+                <button onclick="downloadAsJSON()">Save</button>
+                <button onclick="readAllTiers()">Read Tiers!</button>
+            </div>
+        </div>
     </div>
-</div>
-<div class="entire-collection">
-    <div class="button-container">
-        <button onclick="createNewTier()">Create A Tier!</button>
-        <button onclick="removeLastTier()">Remove A Tier!</button>
-    </div>
-
-    <div id="item-adder">
-        <input type="file" id="imageUpload" accept="image/*" />
-        <input type="text" id="imageLabel" placeholder="Item Name..." />
-        <button onclick="addImageItemToQueue()">Add Item!</button>
-        <button onclick="downloadAsJSON()">Save</button>
-        <button onclick="readAllTiers()">Read Tiers!</button>
-    </div>
-</div>
-
-<div>
-
-</div>
-
-
 </html>

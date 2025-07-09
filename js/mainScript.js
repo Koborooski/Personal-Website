@@ -103,11 +103,12 @@ function createImageItemElement(itemObj) {
     item.className = 'item';
     item.id = itemObj.id;
     item._itemObj = itemObj;
-    const img = document.createElement('img');    
+    const img = document.createElement('img');
     
     if(itemObj.dataURL){
         console.log("This shit had a dataURL");
         img.src = itemObj.dataURL;
+        item.appendChild(img);
     }
     else {
         console.log("This shit had no dataURL")
@@ -116,9 +117,8 @@ function createImageItemElement(itemObj) {
     const caption = document.createElement('span');
     caption.textContent = itemObj.label;
     
-    item.appendChild(img);
     if (itemObj.label) item.appendChild(caption);
-    li.appendChild(item); 
+    li.appendChild(item);
     
     return li;
 }
