@@ -1,11 +1,10 @@
-function addDraggableToQueue() {
+function setupDraggableQueue() {
     const queue = document.getElementById('queue');
     Sortable.create(queue, {
         group: "item-collection",
         animation: 150
     });
 }
-
 
 function createNewTier(label = "#N/A", color = "#d3d3d3") {
     const allTiers = document.getElementById("tiers-container");
@@ -14,10 +13,10 @@ function createNewTier(label = "#N/A", color = "#d3d3d3") {
         return;
     }
 
-    // ─── Tier wrapper ────────────────────────────────────────────────
+    // ─── Tier container ────────────────────────────────────────────────
     const newTier = document.createElement("li");
     newTier.className = "tier";
-    newTier.style.backgroundColor = color; // optional default
+    newTier.style.backgroundColor = color;
     
     // ─── Editable label ──────────────────────────────────────────────
     const tierLabel = document.createElement("div");
@@ -42,12 +41,12 @@ function createNewTier(label = "#N/A", color = "#d3d3d3") {
     colorPicker.className = "color-picker";
     colorPicker.value = color;
     
-    // live‑update the tier background when user picks a colour
+    // live‑update the tier background when user picks a color
     colorPicker.addEventListener("input", (e) => {
         newTier.style.backgroundColor = e.target.value;
     });
     
-    // ─── Assemble the DOM ────────────────────────────────────────────
+    // ─── Assemble ─────────────────────────────────────────────────
     newTier.appendChild(tierLabel);
     newTier.appendChild(itemContainer);
     sideButtonContainer.appendChild(handle);
@@ -70,22 +69,10 @@ function removeLastTier(){
     const lastTier = allTiers.lastChild;
 
     // This fixes the glitch
-    const itemObj = createImageItemObject(null, 'blank');
-    const itemElement = createImageItemElement(itemObj);
+    const itemElement = createImageItemElement();
     lastTier.appendChild(itemElement);
 
     allTiers.removeChild(lastTier);
-}
-
-function onStartup(){
-    const initialTierLabels = ['S', 'A', 'B', 'C', 'D', 'F'];
-    const initialTierColors = ['#8a2e3f', '#d37755', '#dc995d', '#dec575', '#a8b164', '#6f975e']
-
-    initialTierLabels.forEach((tierLabel , i) => {
-        createNewTier(tierLabel, initialTierColors[i]);
-    });
-
-    addDraggableToQueue()
 }
 
 function createImageItemObject(dataURL, label) {
@@ -96,80 +83,49 @@ function createImageItemObject(dataURL, label) {
     };
 }
 
-function createImageItemElement(itemObj) {
+function createImageItemElement() {
+    const itemPreview = document.getElementById("item-preview");
+    const newItemClone = itemPreview.cloneNode(true); // Deep clone
     const li = document.createElement('li');
-    
-    const item = document.createElement('div');
-    item.className = 'item';
-    item.id = itemObj.id;
-    item._itemObj = itemObj;
-    const img = document.createElement('img');
-    
-    if(itemObj.dataURL){
-        console.log("This shit had a dataURL");
-        img.src = itemObj.dataURL;
-        item.appendChild(img);
-    }
-    else {
-        console.log("This shit had no dataURL")
-    }
 
-    const caption = document.createElement('span');
-    caption.textContent = itemObj.label;
-    
-    if (itemObj.label) item.appendChild(caption);
-    li.appendChild(item);
-    
+    // Assign a  unique ID 
+    newItemClone.id = 'item-' + Math.random().toString(36).substring(2, 9);
+
+    // Remove inline size changes
+    newItemClone.style.width = "";
+    newItemClone.style.height = "";
+
+    // Remove IDs
+    const img = newItemClone.querySelector('img');
+    const p = newItemClone.querySelector('p');
+
+
+    if (img) img.id = '';
+    if (p) p.id = '';
+
+    li.appendChild(newItemClone);
     return li;
 }
 
-
 function addImageItemToQueue() {
     const queue = document.getElementById('queue');
-    const fileInput = document.getElementById('imageUpload');
-    const labelInput = document.getElementById('imageLabel');
+    const newItem = createImageItemElement();
+    queue.appendChild(newItem);
 
-    const file = fileInput.files[0];
-    const label = labelInput.value.trim();
+    // Clear the label, then reset the preview
+    document.getElementById('label-input').value = '';
+    changeItemPreviewLabel();
 
-
-    //If nothing is selected, do nothing
-    if (!file && label === "") {
-        console.log("This shit had nothin");
-        return;
-    }
-    
- 
-    else if (!file) {
-        const itemObj = createImageItemObject(null, label);
-        const itemElement = createImageItemElement(itemObj);
-        queue.appendChild(itemElement);
-        console.log(itemObj);
-    }
-
-    else {
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-            const dataURL = event.target.result;
-            const itemObj = createImageItemObject(dataURL, label);
-            const itemElement = createImageItemElement(itemObj);
-            queue.appendChild(itemElement);
-            console.log(itemObj);
-        };
-        reader.readAsDataURL(file);
-    }
 }
-
 
 function readAllTiers() {
     const allTiers = document.querySelectorAll('.tier');
-
+    
     allTiers.forEach((tier, tierIndex) => {
         console.log(`Tier ${tierIndex}:`);
-
+        
         const items = tier.querySelectorAll('li');
-
+        
         items.forEach((li, itemIndex) => {
             const itemDiv = li.querySelector('.item');
             console.log(itemDiv);
@@ -179,38 +135,236 @@ function readAllTiers() {
                 console.log(`  Item ${itemIndex}: (missing or no _itemObj)`);
             }
         });
-
+        
         if (items.length === 0) {
             console.log(`  (no items)`);
         }
     });
 }
 
-
-
-
-// Not really working right now
-function downloadAsJSON() {
+function showItemSizeSettings() {
+    const settings = document.getElementById("item-height-and-width-container");
+    settings.classList.toggle('hidden');
 }
 
-// Not really working right now
-function importJsonFile() {
-    return
+function setItemSize() {
+    const itemWidth = document.getElementById("item-width");
+    const itemHeight = document.getElementById("item-height");
+    console.log("Setting item size");
+
+    for (const sheet of document.styleSheets) {
+        for (const rule of sheet.cssRules) {
+            if (rule.selectorText === '.item') {
+                rule.style.width = itemWidth.value + "px";
+                rule.style.height = itemHeight.value + "px";
+                break;
+            }
+        }
+    }
+    for (const sheet of document.styleSheets) {
+        for (const rule of sheet.cssRules) {
+            if (rule.selectorText === '.tier') {
+                rule.style.minHeight = (Number(itemHeight.value) + 10) + "px";
+                break
+            }
+        }
+    }
+    for (const sheet of document.styleSheets) {
+        for (const rule of sheet.cssRules) {
+            if (rule.selectorText === '#queue') {
+                rule.style.minHeight = (Number(itemHeight.value) + 10) + "px";
+                break
+            }
+        }
+    }
+
 }
 
-// Not really working right now
-function ExportJsonFile() {
-    return
+function changeItemPreviewSize() {
+    const itemWidthElement = document.getElementById("item-width");
+    const itemHeightElement = document.getElementById("item-height");
+    const itemPreviewElement = document.getElementById("item-preview");
+    
+    // Parse and clamp width
+    let width = Number(itemWidthElement.value);
+    const widthMin = Number(itemWidthElement.min) || 0;
+    const widthMax = Number(itemWidthElement.max) || Infinity;
+    if (width < widthMin) width = widthMin;
+    if (width > widthMax) width = widthMax;
+    itemWidthElement.value = width;
+    
+    // Parse and clamp height
+    let height = Number(itemHeightElement.value);
+    const heightMin = Number(itemHeightElement.min) || 0;
+    const heightMax = Number(itemHeightElement.max) || Infinity;
+    if (height < heightMin) height = heightMin;
+    if (height > heightMax) height = heightMax;
+    itemHeightElement.value = height;
+    
+    // Apply styles
+    itemPreviewElement.style.width = width + "px";
+    itemPreviewElement.style.height = height + "px";
+    
+    console.log("Changing Elements:", width, height);
+}
+    
+function changeItemImageLabelRange() {
+    const itemPreviewImage = document.getElementById("item-preview-image");
+    const itemPreviewLabel = document.getElementById("item-preview-label");
+    const itemRange = document.getElementById("label-img-height-percentage");
+    const labelIsOverlapping = document.getElementById("overlap-text-over-image");
+    const imgHeight = 100 - itemRange.value;
+    const labelHeight = itemRange.value;
+
+    if (labelIsOverlapping.checked){
+        itemPreviewImage.style.height = "100%";
+    }
+    else{
+        itemPreviewImage.style.height = imgHeight + "%";
+    }
+    itemPreviewLabel.style.height = labelHeight + "%";
+    
+    console.log("Image Height: ", imgHeight, "\nLabel Height", labelHeight);
 }
 
-// Only call once, not every time you add a tier
-Sortable.create(document.getElementById("tiers-container"), {
-    animation: 150,
-    handle: ".handle",
-    group: "tier"
-});
+function toggleOverlap() {
+    const itemPreviewElement = document.getElementById("item-preview");
+    itemPreviewElement.classList.toggle("overlap");
+    changeItemImageLabelRange();
+}
 
+function setupSpinnerDetection(input) {
+    input.prevValue = input.value;
 
+    input.addEventListener('input', () => {
+        const currentValue = Number(input.value);
+
+        if (Math.abs(currentValue - input.prevValue) === 1) {changeItemPreviewSize();}
+
+        input.prevValue = currentValue;
+    });
+}
+
+function changeItemPreviewImage() {
+    const itemPreviewImage = document.getElementById("item-preview-image");
+    const imageInput = document.getElementById("image-upload");
+
+    // Check if a file is selected
+    if (imageInput.files && imageInput.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            const dataURL = event.target.result;
+            itemPreviewImage.src = dataURL;
+        };
+
+        reader.readAsDataURL(imageInput.files[0]);
+        itemPreviewImage.style.display = "block";
+    } else {
+        // No file selected, clear the preview image
+        itemPreviewImage.src = "";
+        itemPreviewImage.style.display = "none";
+    }
+}
+
+function changeItemPreviewLabel() {
+    const itemPreviewLabel = document.getElementById("item-preview-label");
+    const labelInput = document.getElementById("label-input");
+    itemPreviewLabel.textContent = labelInput.value;
+}
+
+function setupEnterNavigation() {
+    const inputs = document.querySelectorAll("#item-height-and-width-container input");
+    
+    inputs.forEach((input, index) => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                changeItemPreviewSize();
+                const nextIndex = (index + 1) % inputs.length;
+                inputs[nextIndex].focus();
+                inputs[nextIndex].select();
+            }
+        });
+    });
+}
+
+function setupEnterItemAddition() {
+    const labelInput = document.getElementById("label-input");
+
+    labelInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addImageItemToQueue();
+        }
+    })
+}
+
+function setupDraggableTiers() {
+    Sortable.create(document.getElementById("tiers-container"), {
+        animation: 150,
+        handle: ".handle",
+        group: "tier"
+    });
+}
+
+function setupScrollDrag() {
+    // -1 = up, 1 = down, 0 = no scroll
+    let scrollDirection = 0;
+    const scrollThreshold = 50;
+    const scrollSpeed = 10;
+
+    function onDragOver(e) {
+        if (e.clientY < scrollThreshold) {
+            scrollDirection = -1;
+        } else if (window.innerHeight - e.clientY < scrollThreshold) {
+            scrollDirection = 1;
+        } else {
+            scrollDirection = 0;
+        }
+    }
+
+    function smoothScroll() {
+        if (scrollDirection !== 0) {
+            window.scrollBy(0, scrollDirection * scrollSpeed);
+        }
+        requestAnimationFrame(smoothScroll);
+    }
+
+    document.addEventListener("dragover", onDragOver);
+    requestAnimationFrame(smoothScroll);
+}
+
+function setupDeletionZone() {
+    const deletionZone = document.getElementById("deletion-zone");
+
+    Sortable.create(deletionZone, {
+        animation: 0,
+        group: "item-collection",
+        onAdd: function (evt) {
+            const item = evt.item;
+            item.remove();
+        }
+    });
+}
+
+function onStartup(){
+    const initialTierLabels = ['S', 'A', 'B', 'C', 'D', 'F'];
+    const initialTierColors = ['#8a2e3f', '#d37755', '#dc995d', '#dec575', '#a8b164', '#6f975e']
+    const inputs = document.querySelectorAll(".item-size-container input");
+    
+    initialTierLabels.forEach((tierLabel , i) => {
+        createNewTier(tierLabel, initialTierColors[i]);
+    });
+    inputs.forEach(input => setupSpinnerDetection(input));
+    setItemSize();
+    setupDraggableTiers();
+    setupDraggableQueue();
+    setupEnterNavigation();
+    setupEnterItemAddition();
+    setupDeletionZone();
+    setupScrollDrag();
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     onStartup();
