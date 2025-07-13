@@ -107,6 +107,20 @@ function createImageItemElement() {
     return li;
 }
 
+async function bulkItemCreator() {
+    const input = document.getElementById("folder-upload");
+    const files = Array.from(input.files);
+
+    for (const file of files) {
+        if (file.type.startsWith("image/")) {
+            await changeItemPreviewImage(file); // wait for it to load
+            const item = createImageItemElement(); // now it clones correctly
+            addImageItemToQueue(item);
+        }
+    }
+    input.value = "";
+}
+
 function addImageItemToQueue() {
     const queue = document.getElementById('queue');
     const newItem = createImageItemElement();
@@ -245,26 +259,37 @@ function setupSpinnerDetection(input) {
     });
 }
 
-function changeItemPreviewImage() {
+function changeItemPreviewImage(fileOrInput = document.getElementById('image-upload')) {
     const itemPreviewImage = document.getElementById("item-preview-image");
-    const imageInput = document.getElementById("image-upload");
 
-    // Check if a file is selected
-    if (imageInput.files && imageInput.files[0]) {
+    return new Promise((resolve) => {
+        let file = fileOrInput;
+
+        // If the argument is an input element, extract its file
+        if (fileOrInput instanceof HTMLInputElement) {
+            file = fileOrInput.files[0];
+        }
+
+        if (!file || !file.type.startsWith("image/")) {
+            itemPreviewImage.src = "";
+            itemPreviewImage.style.display = "none";
+            resolve(); // Still resolve, just skip
+            return;
+        }
+
         const reader = new FileReader();
 
         reader.onload = function(event) {
-            const dataURL = event.target.result;
-            itemPreviewImage.src = dataURL;
+            itemPreviewImage.src = event.target.result;
+            itemPreviewImage.style.display = "block";
+
+            itemPreviewImage.onload = function () {
+                resolve(); // resolve only when image visually loads
+            };
         };
 
-        reader.readAsDataURL(imageInput.files[0]);
-        itemPreviewImage.style.display = "block";
-    } else {
-        // No file selected, clear the preview image
-        itemPreviewImage.src = "";
-        itemPreviewImage.style.display = "none";
-    }
+        reader.readAsDataURL(file);
+    });
 }
 
 function changeItemPreviewLabel() {
