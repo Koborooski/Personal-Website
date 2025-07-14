@@ -73,7 +73,7 @@ function removeLastTier(){
     const lastTier = allTiers.lastChild;
 
     // This fixes the glitch
-    const itemElement = cloneItemPreviewAsNewItem();
+    const itemElement = createImageItemElement("temp", "", "", "69%","1px");
     lastTier.appendChild(itemElement);
 
     allTiers.removeChild(lastTier);
@@ -94,6 +94,13 @@ function createImageItemElement(itemId, itemImg, itemText, itemTextAreaHeight, i
     
     div.id = itemId; 
     div.className = "item overlap";
+    if (!itemText) {
+        div.classList.add("no-label");
+    }
+    if (!itemImg || itemImg.endsWith(".html")) {
+        div.classList.add("no-img");
+    }
+
     div.style.fontSize = itemFontSize;
 
     img.src = itemImg;
@@ -128,21 +135,36 @@ function cloneItemPreviewAsNewItem() {
     const itemPreview = document.getElementById("item-preview");
     const newItemClone = itemPreview.cloneNode(true); // Deep clone
     const li = document.createElement('li');
+    const img = newItemClone.querySelector('img');
+    const p = newItemClone.querySelector('p');
+    console.log(img.src);
+    if (itemPreview.classList.contains("no-label") && itemPreview.classList.contains("no-img")) {
+        alert("First add an image OR write some text (or both)");
+        return
+    }
+    else if ((img.src === "") && (p.textContent === "")) { 
+        alert("First add an image OR write some text (or both)");
+        return;
+    }
+    else if (img.src === "") {
+        newItemClone.classList.add("no-img");
+
+        newItemClone.classList.remove("no-label");
+    }
+    else if (!p.textContent) {
+        newItemClone.classList.remove("no-img")
+        newItemClone.classList.add("no-label")
+    }
 
     // Assign a  unique ID 
-    console.log("Testing 123...")
     newItemClone.id = 'item-' + itemIdCounter;
     itemIdCounter += 1;
 
     // Remove inline size changes
     newItemClone.style.width = "";
     newItemClone.style.height = "";
-
+    
     // Remove IDs
-    const img = newItemClone.querySelector('img');
-    const p = newItemClone.querySelector('p');
-
-
     if (img) img.id = '';
     if (p) p.id = '';
 
@@ -272,44 +294,55 @@ function changeItemPreviewFontSize() {
     itemPreviewElement.style.fontSize = fontSize + "px";
 }
 
-// This can def be changed up a bit but I'm too lazy to fix that right now
-function changeItemPreviewImage(fileOrInput = document.getElementById('image-upload')) {
+
+function changeItemPreviewImage(input = document.getElementById('image-upload')) {
+    const itemPreview = document.getElementById("item-preview");
     const itemPreviewImage = document.getElementById("item-preview-image");
+    console.log("Starting the change")
+    if (!input || !input.files || input.files.length === 0) {
+        console.log("No file existed");
+        itemPreviewImage.src = "";
+        itemPreview.classList.add("no-img");
+        return;
+    }
 
-    return new Promise((resolve) => {
-        let file = fileOrInput;
+    const file = input.files[0];
 
-        // If the argument is an input element, extract its file
-        if (fileOrInput instanceof HTMLInputElement) {
-            file = fileOrInput.files[0];
-        }
+    if (!file.type.startsWith("image/")) {
+        console.warn("Selected file is not an image.");
+        itemPreviewImage.removeAttribute('src');
+        return;
+    }
 
-        if (!file || !file.type.startsWith("image/")) {
-            itemPreviewImage.src = "";
-            itemPreviewImage.style.display = "none";
-            resolve();
-            return;
-        }
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        console.log("We had a thingy ya feel")
+        itemPreviewImage.src = event.target.result;
+        itemPreview.classList.remove("no-img");
+    };
 
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-            itemPreviewImage.src = event.target.result;
-            itemPreviewImage.style.display = "block";
-
-            itemPreviewImage.onload = function () {
-                resolve();
-            };
-        };
-
-        reader.readAsDataURL(file);
-    });
+    reader.readAsDataURL(file);
 }
+
 
 function changeItemPreviewLabel() {
     const itemPreviewLabel = document.getElementById("item-preview-label");
+    const itemPreview = document.getElementById("item-preview");
     const labelInput = document.getElementById("label-input");
     itemPreviewLabel.textContent = labelInput.value;
+
+    if (labelInput.value !== "") {
+        itemPreview.classList.remove("no-label");
+    }
+    else {
+        itemPreview.classList.add("no-label");
+    }
+}
+
+function showItemSizeSettings() {
+    const itemSizeSettings = document.getElementById("item-height-and-width-container");
+    itemSizeSettings.classList.toggle("hidden");
+    
 }
 
 function setupTitleEnterCommand() {
