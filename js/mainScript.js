@@ -596,7 +596,7 @@ function importJsonFile() {
         alert("Please select a JSON file.");
         return;
     }
-
+    clearQueue();
     clearAllTiers();
 
     const reader = new FileReader();
@@ -631,6 +631,9 @@ function importJsonFile() {
     }
 
     reader.readAsText(file)
+    
+    jsonFileElement.value = "";
+
 }
 
 
