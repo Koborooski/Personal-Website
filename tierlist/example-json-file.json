@@ -35,6 +35,11 @@
             "tierLabel": "F",
             "tierColor": "#6f975e",
             "tierItems": []
+        },
+        {
+            "tierLabel": "Obelisk (Trash btw)",
+            "tierColor": "#762c90",
+            "tierItems": []
         }
     ],
     "queue": [
