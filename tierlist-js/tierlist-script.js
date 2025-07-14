@@ -1,15 +1,5 @@
 let itemIdCounter = 0;
 
-function rgbToHex(rgb) {
-  const result = rgb.match(/\d+/g).map(Number);
-  return (
-    "#" +
-    result
-      .map((n) => n.toString(16).padStart(2, "0"))
-      .join("")
-  );
-}
-
 function setupDraggableQueue() {
     const queue = document.getElementById('queue');
     Sortable.create(queue, {
@@ -96,6 +86,44 @@ function clearAllTiers() {
     };
 }
 
+function createImageItemElement(itemId, itemImg, itemText, itemTextAreaHeight, itemFontSize) {
+    const li = document.createElement("li");
+    const div = document.createElement("div");
+    const img = document.createElement("img");
+    const p = document.createElement("p");
+    
+    div.id = itemId; 
+    div.className = "item overlap";
+    div.style.fontSize = itemFontSize;
+
+    img.src = itemImg;
+    img.alt = "Some rando image";
+
+    p.textContent = itemText;
+    p.style.height = itemTextAreaHeight;
+
+    console.log("Text:", itemText);
+    console.log("Height:", itemTextAreaHeight);
+    console.log("Font size:", itemFontSize);
+
+
+    div.appendChild(img);
+    div.appendChild(p);
+    li.appendChild(div);
+
+    return li;
+}
+
+function addItemToQueue(itemElement) {
+    const queue = document.getElementById("queue");
+    queue.appendChild(itemElement);
+}
+
+function addItemToTier(itemElement, tierElement) {
+    const itemContainer = tierElement.querySelector('.item-container');
+    itemContainer.appendChild(itemElement);
+}
+
 function cloneItemPreviewAsNewItem() {
     const itemPreview = document.getElementById("item-preview");
     const newItemClone = itemPreview.cloneNode(true); // Deep clone
@@ -131,7 +159,7 @@ function bulkItemCreator() {
             
             const reader = new FileReader();
             reader.onload = function(event) {
-                const item = createImageItemElementAgain(("item-" + itemIdCounter), event.target.result, "", "0%", "0px");
+                const item = createImageItemElement(("item-" + itemIdCounter), event.target.result, "", "0%", "0px");
                 itemIdCounter++;
                 addItemToQueue(item);
             }
@@ -139,24 +167,6 @@ function bulkItemCreator() {
         }
     }
     input.value = "";
-}
-
-async function loadItemFromDataURL(item) {
-    const label = item.itemText;
-    const imageDataURL = item.itemImg;
-
-    document.getElementById("label-input").value = label || "";
-    changeItemPreviewLabel();
-
-    const itemPreviewImage = document.getElementById("item-preview-image");
-    itemPreviewImage.src = imageDataURL;
-    itemPreviewImage.style.display = "block";
-
-    await new Promise(resolve => {
-        itemPreviewImage.onload = () => resolve();
-    });
-
-    addPreviewCloneToQueue();
 }
 
 function addPreviewCloneToQueue() {
@@ -173,34 +183,6 @@ function addPreviewCloneToQueue() {
 function clearQueue() {
     const queueElement = document.getElementById("queue");
     queueElement.replaceChildren();
-}
-
-function readAllTiers() {
-    const allTiers = document.querySelectorAll('.tier');
-    
-    allTiers.forEach((tier, tierIndex) => {
-        console.log(`Tier ${tierIndex}:`);
-        
-        const items = tier.querySelectorAll('li');
-        
-        items.forEach((li, itemIndex) => {
-            const item = li.querySelector('.item');
-            const img = item.querySelector('img');
-            const imgSrc = img ? img.src : null;
-
-            console.log(`Item ID: ${item.id}`);
-            console.log(`Image src: ${imgSrc}`);
-        });
-        
-        if (items.length === 0) {
-            console.log(`  (no items)`);
-        }
-    });
-}
-
-function showItemSizeSettings() {
-    const settings = document.getElementById("item-height-and-width-container");
-    settings.classList.toggle('hidden');
 }
 
 function setItemSize() {
@@ -290,12 +272,7 @@ function changeItemPreviewFontSize() {
     itemPreviewElement.style.fontSize = fontSize + "px";
 }
 
-function toggleOverlap() {
-    const itemPreviewElement = document.getElementById("item-preview");
-    itemPreviewElement.classList.toggle("overlap");
-    changeItemImageLabelRange();
-}
-
+// This can def be changed up a bit but I'm too lazy to fix that right now
 function changeItemPreviewImage(fileOrInput = document.getElementById('image-upload')) {
     const itemPreviewImage = document.getElementById("item-preview-image");
 
@@ -334,7 +311,6 @@ function changeItemPreviewLabel() {
     const labelInput = document.getElementById("label-input");
     itemPreviewLabel.textContent = labelInput.value;
 }
-
 
 function setupTitleEnterCommand() {
     const title = document.getElementById("tierlist-title");
@@ -528,7 +504,6 @@ function exportPersonalJsonFile() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
-
 // This will pull all items and only keep track of their ID. 
 function exportTemplateJsonFile() {
     const titleElement = document.getElementById('tierlist-title');
@@ -585,6 +560,7 @@ function exportTemplateJsonFile() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
+
 function importJsonFile() {
     const titleElement = document.getElementById('tierlist-title');
     const itemWidthElement = document.getElementById("item-width");
@@ -618,13 +594,13 @@ function importJsonFile() {
             createNewTier(tier.tierLabel, tier.tierColor);
             const newTier = document.getElementById("tiers-container").lastChild;
             allItems.forEach(item => {
-                const itemElement = createImageItemElementAgain(item.itemID, item.itemImg, item.itemText, item.itemTextAreaHeight, item.itemFontSize);
+                const itemElement = createImageItemElement(item.itemID, item.itemImg, item.itemText, item.itemTextAreaHeight, item.itemFontSize);
                 addItemToTier(itemElement, newTier);
             });
         });
 
         queue.forEach(item => {
-            const itemElement = createImageItemElementAgain(item.itemID, item.itemImg, item.itemText, item.itemTextAreaHeight, item.itemFontSize);
+            const itemElement = createImageItemElement(item.itemID, item.itemImg, item.itemText, item.itemTextAreaHeight, item.itemFontSize);
             addItemToQueue(itemElement);
         });
 
@@ -635,8 +611,6 @@ function importJsonFile() {
     jsonFileElement.value = "";
 
 }
-
-
 
 function onStartup(){
     const initialTierLabels = ['S', 'A', 'B', 'C', 'D', 'F'];
@@ -660,47 +634,9 @@ function onStartup(){
     setupFontSizeSelector();
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
     onStartup();
 });
 
 
 
-function createImageItemElementAgain(itemId, itemImg, itemText, itemTextAreaHeight, itemFontSize) {
-    const li = document.createElement("li");
-    const div = document.createElement("div");
-    const img = document.createElement("img");
-    const p = document.createElement("p");
-    
-    div.id = itemId; 
-    div.className = "item overlap";
-    div.style.fontSize = itemFontSize;
-
-    img.src = itemImg;
-    img.alt = "Some rando image";
-
-    p.textContent = itemText;
-    p.style.height = itemTextAreaHeight;
-
-    console.log("Text:", itemText);
-    console.log("Height:", itemTextAreaHeight);
-    console.log("Font size:", itemFontSize);
-
-
-    div.appendChild(img);
-    div.appendChild(p);
-    li.appendChild(div);
-
-    return li;
-}
-
-function addItemToQueue(itemElement) {
-    const queue = document.getElementById("queue");
-    queue.appendChild(itemElement);
-}
-
-function addItemToTier(itemElement, tierElement) {
-    const itemContainer = tierElement.querySelector('.item-container');
-    itemContainer.appendChild(itemElement);
-}

@@ -3,12 +3,12 @@
     <head>
         <meta charset="UTF-8">
         <title>Simple Drag and Drop Local</title>
-        <link rel="stylesheet" href="mainStyle.css">
-        <script src="js/Sortable.min.js"></script>
-        <script src="js/mainScript.js" defer></script>
+        <link rel="stylesheet" href="tierlist-styles.css">
+        <script src="tierlist-js/Sortable.min.js"></script>
+        <script src="tierlist-js/tierlist-script.js" defer></script>
     </head>
     <body>
-    <h1>Tier List Maker</h1>
+    <h1>Kob's Tier List Maker</h1>
     <div id="expanding-zones-container">
         <div id="all-item-holders-container">
                 <textarea id="tierlist-title" rows="1" placeholder="Enter your title..."></textarea>
@@ -36,11 +36,11 @@
                             <label>Text</label>
                         </div>
                         <input type="number" min="5" max="40" value="15" id="font-size-option" class="hide-spinner" onchange="changeItemPreviewFontSize()">
-                        <label for="font-size-option">Overlap?</label>
+                        <label for="font-size-option">Font Size</label>
                     </div>
                     <div id="item-preview" class="item overlap">
-                        <img id="item-preview-image" src="data:image/png;base64,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" alt="Any Image Really">
-                        <p id="item-preview-label">Starter Text!</p>
+                        <img id="item-preview-image">
+                        <p id="item-preview-label"></p>
                     </div>
                     <div id="item-height-and-width-container" class="hidden">
                         <h3>Change Item Size</h3>
@@ -58,7 +58,7 @@
                         <button id="add-item-button" onclick="addPreviewCloneToQueue()">Add Item!</button>
                         <input type="file" id="image-upload" onchange="changeItemPreviewImage()" accept="image/*">
                         <label id="image-upload-label" for="image-upload">Upload Image</label>
-                        <input type="text" id="label-input" oninput="changeItemPreviewLabel()" placeholder="Item Name...">
+                        <input type="text" id="label-input" oninput="changeItemPreviewLabel()" placeholder="Your text...">
                     </div>
                     <div id="upload-bulk-image-items">
 
@@ -74,10 +74,10 @@
                         <button onclick="exportPersonalJsonFile()">Save For Self</button>
                         <input type="file" id="json-upload" onchange="importJsonFile()" accept=".json">
                         <label id="json-upload-label" for="json-upload">Upload JSON File</label>
-
                     </div>
                 </div>
             </div>
         </div>
+        <footer>I'm bad at styling :( please give suggestions for this bottom part</footer>
     </body>
 </html>
