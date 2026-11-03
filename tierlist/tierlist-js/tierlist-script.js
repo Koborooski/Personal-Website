@@ -103,7 +103,7 @@ function createImageItemElement(itemId, itemImg, itemText, itemTextAreaHeight, i
 
     div.style.fontSize = itemFontSize;
 
-    img.src = itemImg;
+    if (itemImg) img.src = itemImg;
     img.alt = "Some rando image";
 
     p.textContent = itemText;
@@ -347,14 +347,12 @@ function showItemSizeSettings() {
 
 function setupTitleEnterCommand() {
     const title = document.getElementById("tierlist-title");
-    const firstTier = document.querySelector(".tier").querySelector('.tier-label');
-
     title.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            firstTier.focus();
+            document.querySelector(".tier .tier-label")?.focus();
         }
-    })
+    });
 }
 
 function setupEnterNavigation() {
@@ -472,191 +470,217 @@ function setupDeletionZone() {
         }
     });
 }
-// This will include items within tiers, as if someone already ranked it.
-function exportPersonalJsonFile() {
+
+function getTierListState() {
     const titleElement = document.getElementById('tierlist-title');
     const itemPreviewElement = document.getElementById('item-preview');
-    const queueItems = document.getElementById('queue').querySelectorAll('.item');
-    const queueData = [];
-    const tiers = document.querySelectorAll('.tier');
-    const tiersData = [];
 
-    tiers.forEach(tier => {
-        const tierLabelElement = tier.querySelector('.tier-label');
-        const tierItems = tier.querySelectorAll('.item');
-        const itemData = [];
+    // Each unique image is stored once; items refer to it by index
+    const images = [];
+    const imageIndex = new Map();   // image data -> its index in `images`
 
-        tierItems.forEach(item => {
-            const img = item.querySelector('img');
-            const text = item.querySelector('p');
-
-            itemData.push({
-                itemID: item.id,
-                itemImg: img?.src || null,
-                itemText: text?.textContent || "",
-                itemTextAreaHeight: text.style.height,
-                itemFontSize: item.style.fontSize
-            });
-        });
-
-        tiersData.push({
-        tierLabel: tierLabelElement?.value || "",
-        tierColor: getComputedStyle(tier).backgroundColor,
-        tierItems: itemData
-        });
-    });
-
-    queueItems.forEach(item => {
+    const readItem = item => {
         const img = item.querySelector('img');
         const text = item.querySelector('p');
+        const src = img?.getAttribute('src') || null;
 
-        queueData.push({
+        let itemImgRef = null;
+        if (src) {
+            if (!imageIndex.has(src)) {
+                imageIndex.set(src, images.length);
+                images.push(src);
+            }
+            itemImgRef = imageIndex.get(src);
+        }
+
+        return {
             itemID: item.id,
-            itemImg: img?.src || null,
-            itemText: text?.value || "",
-            itemTextAreaHeight: text.style.height,
+            itemImgRef,
+            itemText: text?.textContent || "",
+            itemTextAreaHeight: text?.style.height || "",
             itemFontSize: item.style.fontSize
-        });
-    });
-
-    const myShiiiYaFeel = { 
-        tierListTitle: titleElement?.value || "Silly Goose",
-        baseItemSize: {width: itemPreviewElement.style.width, height: itemPreviewElement.style.height},
-        idCounter: itemIdCounter,
-        allTiers: tiersData,
-        queue: queueData
+        };
     };
-    const json = JSON.stringify(myShiiiYaFeel, null, 4);
+
+    const allTiers = [...document.querySelectorAll('.tier')].map(tier => ({
+        tierLabel: tier.querySelector('.tier-label')?.value || "",
+        tierColor: tier.querySelector('.color-picker').value,
+        tierItems: [...tier.querySelectorAll('.item')].map(readItem)
+    }));
+    const queue = [...document.querySelectorAll('#queue .item')].map(readItem);
+
+    return {
+        tierListTitle: titleElement?.value || "Silly Goose",
+        baseItemSize: { width: itemPreviewElement.style.width, height: itemPreviewElement.style.height },
+        idCounter: itemIdCounter,
+        images,
+        allTiers,
+        queue
+    };
+}
+
+function downloadJson(data, filename) {
+    const json = JSON.stringify(data, null, 4);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'My ' + (titleElement?.value || "Silly Goose") + ' Tierlist.json';
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
-// This will pull all items and only keep track of their ID. 
+
+// This will include items within tiers, as if someone already ranked it.
+function exportPersonalJsonFile() {
+    const state = getTierListState();
+    downloadJson(state, 'My ' + state.tierListTitle + ' Tierlist.json');
+}
+
+// This will pull all items into the queue, unranked, in the order they were created.
 function exportTemplateJsonFile() {
-    const titleElement = document.getElementById('tierlist-title');
-    const itemPreviewElement = document.getElementById('item-preview');
-    const items = document.querySelectorAll('.item');
-    const itemData = [];
-    const tiers = document.querySelectorAll('.tier');
-    const tiersData = [];
+    const state = getTierListState();
 
-    tiers.forEach(tier => {
-        const tierLabelElement = tier.querySelector('.tier-label');
+    // Gather every item: the ones in tiers plus the ones already in the queue
+    const allItems = [
+        ...state.allTiers.flatMap(tier => tier.tierItems),
+        ...state.queue
+    ];
 
-        tiersData.push({
-        tierLabel: tierLabelElement?.value || "",
-        tierColor: tier.querySelector(".color-picker").value,
-        tierItems: []
-        });
+    // Sort by creation order (item-0, item-1, ...)
+    const idNumber = item => parseInt(item.itemID.replace("item-", ""), 10) || 0;
+    allItems.sort((a, b) => idNumber(a) - idNumber(b));
+
+    // Empty the tiers, put everything in the queue
+    state.allTiers.forEach(tier => tier.tierItems = []);
+    state.queue = allItems;
+
+    downloadJson(state, state.tierListTitle + ' Tierlist Template.json');
+}
+
+function loadTierListState(data) {
+    clearQueue();
+    clearAllTiers();
+
+    document.getElementById('tierlist-title').value = data.tierListTitle;
+    document.getElementById("item-width").value = parseInt(data.baseItemSize.width);
+    document.getElementById("item-height").value = parseInt(data.baseItemSize.height);
+    setItemSize();
+    itemIdCounter = data.idCounter;
+
+    const makeItem = item => createImageItemElement(
+        item.itemID,
+        item.itemImg ?? data.images?.[item.itemImgRef] ?? null,
+        item.itemText, item.itemTextAreaHeight, item.itemFontSize
+    );
+    data.allTiers.forEach(tier => {
+        createNewTier(tier.tierLabel, toHexColor(tier.tierColor));
+        const newTier = document.getElementById("tiers-container").lastChild;
+        tier.tierItems.forEach(item => addItemToTier(makeItem(item), newTier));
     });
 
-    items.forEach(item => {
-        if (item.id === "item-preview") return;
+    data.queue.forEach(item => addItemToQueue(makeItem(item)));
 
-        const img = item.querySelector('img');
-        const text = item.querySelector('p');
+    // The old tier labels were deleted, so hook Enter navigation up to the new ones
+    setupTierNavigation();
+}
 
-        itemData.push({
-            itemID: item.id,
-            itemImg: img?.src || null,
-            itemText: text?.textContent || "",
-            itemTextAreaHeight: text.style.height,
-            itemFontSize: item.style.fontSize
-        });
-    });
-    itemData.sort((a, b) => {
-        const idA = parseInt(a.itemID.replace("item-", ""), 10);
-        const idB = parseInt(b.itemID.replace("item-", ""), 10);
-        return idA - idB;
-    });
-    const myShiiiYaFeel = { 
-        tierListTitle: titleElement?.value || "Silly Goose",
-        baseItemSize: {width: itemPreviewElement.style.width, height: itemPreviewElement.style.height},
-        idCounter: itemIdCounter,
-        allTiers: tiersData,
-        queue: itemData
-    };
-    const json = JSON.stringify(myShiiiYaFeel, null, 4);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = (titleElement?.value || "Silly Goose") + ' Tierlist Template.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+// Older "Save For Self" files stored colors as "rgb(r, g, b)", which color pickers can't use
+function toHexColor(color) {
+    const match = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(color);
+    if (!match) return color;
+    return "#" + match.slice(1).map(n => Number(n).toString(16).padStart(2, "0")).join("");
 }
 
 function importJsonFile() {
-    const titleElement = document.getElementById('tierlist-title');
-    const itemWidthElement = document.getElementById("item-width");
-    const itemHeightElement = document.getElementById("item-height");
     const jsonFileElement = document.getElementById("json-upload");
-
     const file = jsonFileElement.files[0];
     if (!file) {
         alert("Please select a JSON file.");
         return;
     }
-    clearQueue();
-    clearAllTiers();
 
     const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            loadTierListState(JSON.parse(e.target.result));
+        } catch (err) {
+            console.error(err);
+            alert("That file couldn't be loaded. Is it a tier list JSON file?");
+        }
+    };
+    reader.readAsText(file);
 
-    reader.onload = function(e) {
-        const data = JSON.parse(e.target.result);
-        const allTiers = data.allTiers;
-        const queue = data.queue;
-
-        titleElement.value = data.tierListTitle;
-        itemWidthElement.value = parseInt(data.baseItemSize.width);
-        itemHeightElement.value = parseInt(data.baseItemSize.height);
-        setItemSize();
-        itemIdCounter = data.idCounter;
-
-        allTiers.forEach(tier => {
-            const allItems = tier.tierItems;
-            console.log("Making a new tier");
-            createNewTier(tier.tierLabel, tier.tierColor);
-            const newTier = document.getElementById("tiers-container").lastChild;
-            allItems.forEach(item => {
-                const itemElement = createImageItemElement(item.itemID, item.itemImg, item.itemText, item.itemTextAreaHeight, item.itemFontSize);
-                addItemToTier(itemElement, newTier);
-            });
-        });
-
-        queue.forEach(item => {
-            const itemElement = createImageItemElement(item.itemID, item.itemImg, item.itemText, item.itemTextAreaHeight, item.itemFontSize);
-            addItemToQueue(itemElement);
-        });
-
-    }
-
-    reader.readAsText(file)
-    
     jsonFileElement.value = "";
-
 }
 
-function onStartup(){
-    const initialTierLabels = ['S', 'A', 'B', 'C', 'D', 'F'];
-    const initialTierColors = ['#8a2e3f', '#d37755', '#dc995d', '#dec575', '#a8b164', '#6f975e']
-    
-    initialTierLabels.forEach((tierLabel , i) => {
-        createNewTier(tierLabel, initialTierColors[i]);
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('tierlist-db', 1);
+        req.onupgradeneeded = () => req.result.createObjectStore('saves');
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
     });
+}
+
+async function saveState(state) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('saves', 'readwrite');
+        tx.objectStore('saves').put(state, 'current');
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function loadState() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const req = db.transaction('saves').objectStore('saves').get('current');
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+let saveTimer;
+function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => saveState(getTierListState()).catch(console.error), 500);
+}
+
+function startAutosave() {
+    // Catches drags, added/removed items and tiers, and color changes
+    new MutationObserver(scheduleSave).observe(
+        document.getElementById('all-item-holders-container'),
+        { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] }
+    );
+    // Catches typing in the title and tier labels (typing doesn't change the DOM)
+    document.addEventListener('input', scheduleSave);
+}
+
+async function onStartup() {
+    // Restore the last session if there is one, otherwise make the default tiers
+    const saved = await loadState().catch(err => {
+        console.error("Couldn't load saved tier list:", err);
+        return null;
+    });
+
+    if (saved) {
+        loadTierListState(saved);   // this already runs setupTierNavigation()
+    } else {
+        const initialTierLabels = ['S', 'A', 'B', 'C', 'D', 'F'];
+        const initialTierColors = ['#8a2e3f', '#d37755', '#dc995d', '#dec575', '#a8b164', '#6f975e'];
+        initialTierLabels.forEach((tierLabel, i) => {
+            createNewTier(tierLabel, initialTierColors[i]);
+        });
+        setupTierNavigation();
+    }
+
     changeItemPreviewFontSize();
     changeItemPreviewSize();
     changeItemImageLabelRange();
     setupTitleEnterCommand();
-    setupTierNavigation();
     setItemSize();
     setupDraggableTiers();
     setupDraggableQueue();
@@ -665,11 +689,14 @@ function onStartup(){
     setupDeletionZone();
     setupScrollDrag();
     setupFontSizeSelector();
+
+    // Start watching for changes only after everything is built
+    startAutosave();
+    navigator.storage?.persist?.();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     onStartup();
 });
-
 
 
