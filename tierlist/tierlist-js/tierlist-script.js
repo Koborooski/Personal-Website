@@ -867,7 +867,7 @@ async function exportPng() {
     try {
         const canvas = await html2canvas(source, {
             backgroundColor: getComputedStyle(document.body).backgroundColor,
-            ignoreElements: el => el.matches?.(".side-button-container, #queue"),
+            ignoreElements: el => el.matches?.(".side-button-container, #queue, #tier-buttons-container"),
             // html2canvas draws textareas poorly, so swap them for plain text in its copy of the page
             onclone: (doc) => {
                 doc.querySelectorAll("#all-item-holders-container textarea").forEach((textarea, i) => {

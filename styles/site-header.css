@@ -1,0 +1,162 @@
+/* Shared site header, used on every page (including the tier list).
+   Self-contained: it brings its own colours, font and resets, so it looks the same
+   no matter what the page's own stylesheet does.
+
+   Style: a solid bar pinned to the top, with a green underline that slides to
+   whichever link you hover (the sliding part comes from scripts/site-header.js). */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+.site-header {
+  --header-bg: #21252b;
+  --header-border: #3e4451;
+  --header-text: #9da5b4;
+  --header-text-active: #d3d3d3;
+  --header-accent: #acf777;
+  --header-logo: #ff4f5b;
+  --header-font: 'JetBrains Mono', Consolas, monospace;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  line-height: 1.6;
+}
+
+.site-header *,
+.site-header *::before,
+.site-header *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.site-header .header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-header a {
+  text-decoration: none;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-family: var(--header-font);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--header-logo);
+  white-space: nowrap;
+}
+
+.site-logo:hover {
+  color: var(--header-logo);
+}
+
+.site-logo img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  image-rendering: pixelated;
+}
+
+.site-nav {
+  position: relative;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 22px;
+  align-self: stretch;
+}
+
+.site-nav li {
+  display: flex;
+}
+
+.site-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-family: var(--header-font);
+  font-size: 0.9rem;
+  color: var(--header-text);
+  transition: color 0.15s ease;
+}
+
+.site-nav a:hover,
+.site-nav a.nav-active {
+  color: var(--header-text-active);
+}
+
+/* Plain underline (used when the sliding one isn't running) */
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--header-accent);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.site-nav a:hover::after,
+.site-nav a.nav-active::after {
+  transform: scaleX(1);
+}
+
+/* Sliding underline: one bar that moves between links (positioned by site-header.js) */
+.site-nav.has-indicator a::after {
+  display: none;
+}
+
+.nav-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  border-radius: 3px 3px 0 0;
+  background: var(--header-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s ease, width 0.25s ease, opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-indicator,
+  .site-nav a::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-header .header-inner {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .site-logo {
+    padding: 8px 0 4px;
+  }
+
+  .site-nav {
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .site-nav a {
+    padding: 4px 0 8px;
+  }
+}

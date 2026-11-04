@@ -4,23 +4,37 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Kob's Tier List Maker</title>
+        <link rel="stylesheet" href="../styles/site-header.css">
         <link rel="stylesheet" href="tierlist-styles.css">
         <link rel="icon" type="image/png" href="../Images/favicon.png">
         <script src="tierlist-js/Sortable.min.js"></script>
         <script src="tierlist-js/html2canvas.min.js" defer></script>
         <script src="tierlist-js/tierlist-script.js" defer></script>
+        <script src="../scripts/site-header.js" defer></script>
     </head>
     <body>
-    <header id="page-header">
-        <h1>Kob's Tier List Maker</h1>
-        <div id="tier-buttons-container">
-            <button id="remove-tier-button" class="tier-button">- Tier</button>
-            <button id="add-tier-button" class="tier-button">+ Tier</button>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../index.html" class="site-logo">
+                <img src="../Images/kob.webp" alt="">
+                Kob's Website
+            </a>
+            <ul class="site-nav">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a class="nav-active" href="tierlist-site.html">Tierlist</a></li>
+            </ul>
         </div>
     </header>
+
+    <main id="tierlist-main">
     <div id="expanding-zones-container">
         <div id="all-item-holders-container">
             <textarea id="tierlist-title" rows="1" placeholder="Enter your title..." aria-label="Tier list title"></textarea>
+            <div id="tier-buttons-container">
+                <button id="remove-tier-button" class="tier-button">- Tier</button>
+                <button id="add-tier-button" class="tier-button">+ Tier</button>
+            </div>
             <ul id="tiers-container"></ul>
             <ul id="queue">
                 <!--Items created are placed here-->
@@ -104,5 +118,6 @@
             <p class="hint">Or double right-click an item to delete it.</p>
         </div>
     </section>
+    </main>
     </body>
 </html>

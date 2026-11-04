@@ -1,37 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>My Index Page</title>
-        <link rel="icon" type="image/png" href="Images/favicon.png">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: #282c34;
-                color: #d3d3d3;
-                padding: 2rem;
-            }
-            h1 {
-                color: #ff4f5b;
-            }
-            li a {
-                color: #acf777;
-                text-decoration: none;
-                display: block;
-            }
-            li a:hover {
-                text-decoration: underline;
-            }
-        </style>
-    </head>
-    <body>
 
-        <h1>Kob's Website</h1>
-        <p>Select a page to view (I'll add more soon):</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kob's Website</title>
+  <meta name="description" content="Kob: artist, animator and game developer. Projects, games and links." />
+  <link rel="stylesheet" href="styles/site.css" />
+  <link rel="stylesheet" href="styles/site-header.css" />
+  <link rel="icon" type="image/png" href="Images/favicon.png" />
+</head>
 
-        <ul>
-            <li><a href="tierlist/tierlist-site.html">Kob's Tier List Maker</a></li>
-        </ul>
-    </body>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo">
+        <img src="Images/kob.webp" alt="" class="pixel" />
+        Kob's Website
+      </a>
+      <ul class="site-nav">
+        <li><a class="nav-active" href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="tierlist/tierlist-site.html">Tierlist</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="section">
+      <div class="container hero">
+        <div>
+          <h1>Koborooski (Kob)</h1>
+          <span class="subtitle">Dev • Artist • Animations Specialist</span>
+          <p>
+            Hey, I'm Kob, the witty, charming, and most handsome dev on the team (according to my girlfriend).
+          </p>
+          <p>
+            I'm the lead animations expert for Rat Haven Studios. My focus is creating something visually sparking and
+            unique for our games. I'm a sucker for all things pixel art, and only recently began my art journey.
+          </p>
+          <div class="btn-row">
+            <a href="about.html" class="btn">More About Me</a>
+            <a href="https://koborooski.itch.io" class="btn btn-itch" target="_blank" rel="noopener">
+              <img src="Images/icons/itch-icon.svg" alt="" />itch.io
+            </a>
+            <a href="https://rathavenstudios.com" class="btn btn-blue" target="_blank" rel="noopener">Rat Haven Studios</a>
+          </div>
+        </div>
+        <img src="Images/kob.webp" alt="Kob's pixel art avatar" class="hero-avatar pixel" />
+      </div>
+    </section>
+
+    <!-- ART -->
+    <section class="section" id="art">
+      <div class="container">
+        <h2>My Art</h2>
+        <div class="carousel" aria-roledescription="carousel" aria-label="Kob's art">
+          <button class="carousel-arrow prev" aria-label="Previous piece">&#8249;</button>
+          <div class="carousel-track" tabindex="0">
+            <figure class="carousel-slide">
+              <img src="Images/about/knight-sitting.gif" alt="Pixel art knight sitting" class="pixel" data-lightbox />
+              <figcaption>Knight Sitting</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/mono-knight-swing.gif" alt="Knight sword swing" class="pixel" data-lightbox />
+              <figcaption>Knight Swing</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/melee-enemy-flap.gif" alt="Melee enemy flapping" class="pixel" data-lightbox />
+              <figcaption>Melee Enemy</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/centaur-scrape.gif" alt="Centaur hoof scrape" class="pixel" data-lightbox />
+              <figcaption>Centaur Scrape</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/rat.gif" alt="Rat animation" class="pixel" data-lightbox />
+              <figcaption>Rat</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/foreground-parallax.gif" alt="Foreground parallax scene" class="pixel" data-lightbox />
+              <figcaption>Foreground Parallax</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/hoppers-quest-bg.png" alt="Hopper's Quest background" class="pixel" data-lightbox />
+              <figcaption>Hopper's Quest Background</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/starshot-shooting.gif" alt="Starshot player shooting" class="pixel" data-lightbox />
+              <figcaption>Starshot</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/hop-and-scotch-sprites.gif" alt="Hop and Scotch character sprites" class="pixel" data-lightbox />
+              <figcaption>Hop and Scotch Sprites</figcaption>
+            </figure>
+            <figure class="carousel-slide">
+              <img src="Images/about/rat-haven-logo-concept.png" alt="Original Rat Haven Studios logo concept" class="pixel" data-lightbox />
+              <figcaption>Original Rat Haven Studios Logo</figcaption>
+            </figure>
+          </div>
+          <button class="carousel-arrow next" aria-label="Next piece">&#8250;</button>
+          <div class="carousel-dots" role="tablist" aria-label="Choose a piece"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="section" id="projects">
+      <div class="container">
+        <h2>Projects</h2>
+        <div class="card-grid">
+          <div class="card">
+            <h3><a href="tierlist/tierlist-site.html">Kob's Tier List Maker</a></h3>
+            <p>
+              Build tier lists by dragging items between tiers. Add images in bulk, save and load lists, and export
+              the finished list as an image.
+            </p>
+            <a href="tierlist/tierlist-site.html" class="btn">Open</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LINKS -->
+    <section class="section" id="links">
+      <div class="container">
+        <h2>Find Me Elsewhere</h2>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header">
+              <img src="Images/icons/rat-haven-logo.png" alt="" class="card-icon pixel" />
+              <h3><a href="https://rathavenstudios.com" target="_blank" rel="noopener">Rat Haven Studios</a></h3>
+            </div>
+            <p>The indie game studio I run with Hunter. Our games, devlogs and Godot workshop posts live here.</p>
+            <a href="https://rathavenstudios.com" class="btn btn-blue" target="_blank" rel="noopener">Visit</a>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <img src="Images/icons/itch-icon.svg" alt="" class="card-icon" />
+              <h3><a href="https://koborooski.itch.io" target="_blank" rel="noopener">itch.io</a></h3>
+            </div>
+            <p>My games and game jam entries, playable in the browser.</p>
+            <a href="https://koborooski.itch.io" class="btn btn-itch" target="_blank" rel="noopener">Visit</a>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3><a href="https://github.com/Koborooski" target="_blank" rel="noopener">GitHub</a></h3>
+            </div>
+            <p>The code behind my projects, including this website and the tier list maker.</p>
+            <a href="https://github.com/Koborooski" class="btn btn-purple" target="_blank" rel="noopener">Visit</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-icons">
+        <a href="https://koborooski.itch.io" class="footer-icon footer-icon-itch" target="_blank" rel="noopener"
+          aria-label="itch.io" title="itch.io">
+          <img src="Images/icons/itch-icon.svg" alt="" />
+        </a>
+        <a href="https://github.com/Koborooski" class="footer-icon" target="_blank" rel="noopener"
+          aria-label="GitHub" title="GitHub">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+        </a>
+        <a href="https://rathavenstudios.com" class="footer-icon footer-icon-rathaven" target="_blank" rel="noopener"
+          aria-label="Rat Haven Studios" title="Rat Haven Studios">
+          <img src="Images/icons/rat-haven-logo.png" alt="" />
+        </a>
+      </div>
+      <p class="footer-meta">&copy; 2026 Kob &nbsp;&middot;&nbsp; <a href="#">&uarr; back to top</a></p>
+    </div>
+  </footer>
+
+  <script src="scripts/site-header.js"></script>
+  <script src="scripts/carousel.js"></script>
+  <script src="scripts/lightbox.js"></script>
+</body>
+
 </html>

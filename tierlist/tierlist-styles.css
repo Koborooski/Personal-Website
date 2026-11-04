@@ -22,6 +22,11 @@ body {
     background-color: var(--page-bg);
     color: var(--text);
     font-family: Arial, sans-serif;
+    margin: 0;   /* lets the site header span the full width */
+}
+/* Everything below the site header keeps the spacing the body margin used to give */
+#tierlist-main {
+    padding: 8px;
 }
 
 button {
@@ -274,22 +279,16 @@ li {
     cursor: pointer;
 }
 
-/* ─── Page header: site name on the left, tier +/- buttons on the right ─── */
-#page-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 0 4px;
-}
-#page-header h1 {
-    margin: 0;
-}
+/* ─── Tier +/- buttons: right-aligned, just above the first tier ─── */
 #tier-buttons-container {
     display: flex;
+    justify-content: flex-end;
     gap: 6px;
+    margin: 0 2px;
     user-select: none;
+}
+#tier-buttons-container + #tiers-container {
+    margin-top: 4px;
 }
 .tier-button {
     border: 1px solid black;
