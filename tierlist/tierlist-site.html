@@ -2,84 +2,107 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Simple Drag and Drop Local</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kob's Tier List Maker</title>
         <link rel="stylesheet" href="tierlist-styles.css">
         <link rel="icon" type="image/png" href="../Images/favicon.png">
         <script src="tierlist-js/Sortable.min.js"></script>
+        <script src="tierlist-js/html2canvas.min.js" defer></script>
         <script src="tierlist-js/tierlist-script.js" defer></script>
     </head>
     <body>
-    <h1>Kob's Tier List Maker</h1>
+    <header id="page-header">
+        <h1>Kob's Tier List Maker</h1>
+        <div id="tier-buttons-container">
+            <button id="remove-tier-button" class="tier-button">- Tier</button>
+            <button id="add-tier-button" class="tier-button">+ Tier</button>
+        </div>
+    </header>
     <div id="expanding-zones-container">
         <div id="all-item-holders-container">
-                <textarea id="tierlist-title" rows="1" placeholder="Enter your title..."></textarea>
-                <ul id="tiers-container">
-                    <!--Tiers are generated here-->
-                </ul>
-                <div id="tier-buttons-container">
-                    <button id="remove-tier-button" class="tier-button" onclick="removeLastTier()">- Tier</button>
-                    <button id="add-tier-button" class="tier-button" onclick="createNewTier()">+ Tier</button>
-                </div>
-                <ul id="queue">
-                    <!--Items created are placed here-->
-                </ul>
-                <button id="clear-queue-button" onclick="clearQueue()">Clear Queue</button>
-            </div>
+            <textarea id="tierlist-title" rows="1" placeholder="Enter your title..." aria-label="Tier list title"></textarea>
+            <ul id="tiers-container"></ul>
+            <ul id="queue">
+                <!--Items created are placed here-->
+            </ul>
         </div>
-        <div id="entire-collection">
-            <div id="bottom-of-screen-container">
-                <div id="item-preview-container">
-                    <div id="item-preview-visible-buttons-container">
-                        <button id="toggle-size-settings" onclick="showItemSizeSettings()">⚙️</button>
-                        <div id="label-img-height-percentage-container">
-                            <label>Image</label>
-                            <input id="label-img-height-percentage" type="range" value="20" onchange="changeItemImageLabelRange()">
-                            <label>Text</label>
-                        </div>
-                        <input type="number" min="5" max="40" value="15" id="font-size-option" class="hide-spinner" onchange="changeItemPreviewFontSize()">
-                        <label for="font-size-option">Font Size</label>
-                    </div>
-                    <div id="item-preview" class="item overlap no-img no-label">
-                        <img id="item-preview-image" src="">
-                        <p id="item-preview-label"></p>
-                    </div>
-                    <div id="item-height-and-width-container" class="hidden">
-                        <h3>Change Item Size</h3>
-                        <div class="item-size-container">
-                            <input onchange="setItemSize()" id="item-width" class="hide-spinner" type="number" value=125 min=50 max=500 >
-                            <label for="item-width">Width</label>
-                        </div>
-                    
-                        
-                        <div class="item-size-container">
-                            <input onchange="setItemSize()" id="item-height" class="hide-spinner" type="number" value=125 min=50 max=500 >
-                            <label for="item-height">Height</label>
-                        </div>
-                    </div>
-                    <div id="item-adder">
-                        <button id="add-item-button" onclick="addPreviewCloneToQueue()">Add Item!</button>
-                        <input type="file" id="image-upload" onchange="changeItemPreviewImage()" accept="image/*">
-                        <label id="image-upload-label" for="image-upload">Upload Image</label>
-                        <input type="text" id="label-input" oninput="changeItemPreviewLabel()" placeholder="Your text...">
-                    </div>
-                    <div id="upload-bulk-image-items">
+    </div>
 
-                        <input type="file" id="bulk-file-upload" multiple accept="image/*" oninput="bulkItemCreator()">
-                        <label id="bulk-file-upload-label" for="bulk-file-upload">Upload Items In Bulk</label>
+    <section id="control-panel">
+        <div class="panel-card" id="create-item-card">
+            <h2>Create Item</h2>
+            <div id="item-preview-container">
+                <div id="label-img-height-percentage-container">
+                    <label for="label-img-height-percentage">Image</label>
+                    <input id="label-img-height-percentage" type="range" value="20">
+                    <label for="label-img-height-percentage">Text</label>
+                </div>
+                <div id="item-preview" class="item overlap no-img no-label">
+                    <img id="item-preview-image" alt="">
+                    <p id="item-preview-label"></p>
+                </div>
+                <div id="item-adder">
+                    <input type="file" id="image-upload" class="hidden-file-input" accept="image/*">
+                    <label id="image-upload-label" class="file-button" for="image-upload">Upload Image</label>
+                    <button id="remove-image-button" class="hidden">Remove Image</button>
+                    <input type="text" id="label-input" placeholder="Your text..." aria-label="Item text">
+                    <button id="add-item-button">Add Item!</button>
+                    <button id="cancel-edit-button" class="hidden">Cancel Edit</button>
+                </div>
+                <div id="item-options">
+                    <label id="autosize-label-container" class="option-row" title="Size the text box to fit its text">
+                        <input type="checkbox" id="autosize-label" checked>
+                        Autosize
+                    </label>
+                    <div class="option-row">
+                        <input type="number" min="5" max="40" value="15" id="font-size-option" class="hide-spinner">
+                        <label for="font-size-option">Font Size</label>
+                        <button id="apply-font-size-all-button" class="small-button" title="Set every item on the board to this font size">Apply to All</button>
                     </div>
-                    <!--This isn't correct but I'm not really sure the best way to fix it-->
-                    <ul id="deletion-zone">
-                        Deletion Zone
-                    </ul>
-                    <div id="json-file-buttons">
-                        <button onclick="exportTemplateJsonFile()">Save as Template</button>
-                        <button onclick="exportPersonalJsonFile()">Save For Self</button>
-                        <input type="file" id="json-upload" onchange="importJsonFile()" accept=".json">
-                        <label id="json-upload-label" for="json-upload">Upload JSON File</label>
+                    <div id="item-height-and-width-container" class="option-row" title="Item size (50–150)">
+                        <div class="item-size-container">
+                            <input id="item-width" class="hide-spinner" type="number" value=80 min=50 max=150 >
+                            <label for="item-width">W</label>
+                        </div>
+                        <div class="item-size-container">
+                            <input id="item-height" class="hide-spinner" type="number" value=80 min=50 max=150 >
+                            <label for="item-height">H</label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <footer>I'm bad at styling :( please give suggestions for this bottom part</footer>
+
+        <div class="panel-card" id="bulk-add-card">
+            <h2>Bulk Add</h2>
+            <div class="panel-card-center">
+                <input type="file" id="bulk-file-upload" class="hidden-file-input" multiple accept="image/*">
+                <label id="bulk-file-upload-label" class="file-button" for="bulk-file-upload">Upload Items In Bulk</label>
+                <p class="hint">You can also drop image files onto the queue or a tier.</p>
+                <p class="hint">Paste an image (Ctrl+V) to use it in Create Item, and double-click any item to edit it.</p>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <h2>Save &amp; Load</h2>
+            <div class="button-stack">
+                <button id="save-template-button">Save as Template</button>
+                <button id="save-personal-button">Save For Self</button>
+                <input type="file" id="json-upload" class="hidden-file-input" accept=".json">
+                <label id="json-upload-label" class="file-button" for="json-upload">Upload JSON File</label>
+                <button id="export-png-button">Export as Image</button>
+                <button id="new-tierlist-button">New Tier List</button>
+            </div>
+        </div>
+
+        <div class="panel-card" id="delete-card">
+            <h2>Delete</h2>
+            <div id="deletion-zone-wrapper">
+                <ul id="deletion-zone" aria-label="Deletion zone: drag items or tiers here to delete them"></ul>
+                <button id="clear-queue-button">Clear Queue</button>
+            </div>
+            <p class="hint">Or double right-click an item to delete it.</p>
+        </div>
+    </section>
     </body>
 </html>
