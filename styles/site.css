@@ -162,6 +162,11 @@ a:hover {
   transition: border-color 0.15s ease;
 }
 
+/* Photo in the circle: crop toward the face rather than the middle of the picture */
+.hero-photo {
+  object-position: 50% 45%;
+}
+
 .hero-avatar:hover {
   border-color: var(--accent);
 }
