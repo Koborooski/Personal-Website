@@ -1,0 +1,109 @@
+/* Shared site footer, used on every page (including the tier list).
+   Self-contained: it brings its own colours, font and resets, so it looks the same
+   no matter what the page's own stylesheet does.
+
+   Style: a centered row of round platform icons, with copyright and "back to top" underneath. */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+.site-footer {
+  --footer-bg: #21252b;
+  --footer-border: #3e4451;
+  --footer-icon-bg: #2c313a;
+  --footer-icon-text: #d3d3d3;
+  --footer-text: #7f848e;
+  --footer-link: #9da5b4;
+  --footer-accent: #acf777;
+  --footer-itch: #fa5c5c;
+  --footer-itch-hover: #e04848;
+
+  margin-top: 32px;
+  background: var(--footer-bg);
+  border-top: 2px solid var(--footer-border);
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.site-footer *,
+.site-footer *::before,
+.site-footer *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer .footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.footer-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--footer-border);
+  border-radius: 50%;
+  background: var(--footer-icon-bg);
+  color: var(--footer-icon-text);
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+
+.footer-icon:hover {
+  border-color: var(--footer-accent);
+  transform: translateY(-3px);
+}
+
+.footer-icon img,
+.footer-icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.footer-icon-itch {
+  background: var(--footer-itch);
+}
+
+.footer-icon-itch:hover {
+  background: var(--footer-itch-hover);
+}
+
+.footer-icon-rathaven img {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+
+.footer-meta {
+  color: var(--footer-text);
+  font-size: 0.85rem;
+}
+
+.footer-meta a {
+  color: var(--footer-link);
+  text-decoration: none;
+}
+
+.footer-meta a:hover {
+  color: var(--footer-accent);
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-icon {
+    transition: none;
+  }
+}
